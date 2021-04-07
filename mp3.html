@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>My first Vue app</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <div id="app">
+    <input type="text" v-model="query" @keyup.enter="getSongList">
+    <p> {{message}} <p>
+    <audio controls :src="songUrl" autoplay></audio>
+    <p v-for="song in songList" @click="playMusic(song.id)"> {{song.name + ' - ' + song.artists[0].name}} </p>
+  </div>
+
+  <script>
+    var app = new Vue({
+      el: '#app',
+      data: {
+        query: "进击的巨人",
+        message: 'Hello Vue!',
+        songList: [],
+        songUrl: ""
+      },
+      methods: {
+        getSongList: function() {
+          axios.get('https://autumnfish.cn/search?keywords=' + this.query).then(res => {
+            console.log("Processing response...");
+            console.log(res);
+            this.songList = res.data.result.songs;
+          }).catch(err => {
+            console.log(err);
+          });
+        },
+        playMusic: function(songId) {
+            axios.get("https://autumnfish.cn/song/url?id=" + songId).then(res => {
+                console.log(res);
+                this.songUrl = res.data.data[0].url;
+            }).catch(err => {
+                console.log(err);
+            })
+        }
+        
+      }
+    })
+  </script>
+</body>
+</html>
