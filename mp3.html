@@ -48,7 +48,7 @@
       },
       methods: {
         getSongList: function() {
-          axios.get('https://autumnfish.cn/search?keywords=' + this.query + "&num=" + "60").then(res => {
+          axios.get('https://autumnfish.cn/search?keywords=' + this.query + "&limit=" + "60").then(res => {
             console.log("Processing response...");
             console.log(res);
             this.songList = res.data.result.songs;
