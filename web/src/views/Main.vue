@@ -9,6 +9,7 @@
               <template slot="title">分组一</template>
               <el-menu-item index="/song/search">发现音乐</el-menu-item>
               <el-menu-item index="/song/list">我喜欢的音乐</el-menu-item>
+              <el-menu-item index="/test">测试页面</el-menu-item>
             </el-menu-item-group>
           </el-submenu>
         </el-menu>
