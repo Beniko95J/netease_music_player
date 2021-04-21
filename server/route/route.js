@@ -15,7 +15,7 @@ module.exports = app => {
   })
 
   router.delete('/delete/:id', async (req, res) => {
-    await Song.deleteMany({songId: req.params.id});
+    await Song.deleteMany({id: req.params.id});
     res.send({
       success: true
     })

@@ -10,7 +10,21 @@
 
 <style>
 html, body {
-  margin: 0;
-  padding: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0px;
+  padding: 0px;
+  border: 0;
+  min-width: 1200px;
+}
+
+html {
+  transform: translate(0, -9px);
+}
+
+#app {
+  position: relative;
+  min-width: 1200px;
+  height: 100%;
 }
 </style>

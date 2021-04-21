@@ -1,43 +1,52 @@
 <template>
-  <div class="template">
+  <div class="app-container">
+    <div class="bg"></div>
     <HeaderNav></HeaderNav>
-    <el-row class="banner">
-      <transition name="el-fade-in-linear">
-        <el-col :span="24" v-show="bannerShow" class="banner-img">
-          <img src="@/assets/banner/sekiro.jpg" />
-        </el-col>
-      </transition>
-    </el-row>
-    <el-row class='music-container' type="flex" justify="space-around" style="margin:8rem 0 2rem 0">
-      <el-col :span="11">
+    <el-row type="flex" justify="space-around" class='m-container'>
+      <el-col :span="11" class="left-panel">
         <el-row>
-          <el-input placeholder="请输入内容" v-model="input" @keyup.native.enter="getSong(input)"></el-input>
+          <el-col :span="12">
+            <el-input placeholder="请输入内容" v-model="input" @keyup.native.enter="getSong(input)" class="m-input"></el-input>
+          </el-col>
+          <el-col :span="4">
+            <el-button @click="fetch()" class="m-button">显示收藏</el-button>
+          </el-col>
+          <el-col :span="4">
+            <el-button @click="listAllAdd()" class="m-button">全部加入</el-button>
+          </el-col>
+          <el-col :span="4">
+            <el-button @click="listAllRemove()" class="m-button">全部移除</el-button>
+          </el-col>
         </el-row>
-        <el-col class="content">
-          <el-row class="list-title">
+        <el-col class="m-content">
+          <el-row type="flex" justify="start" class="list-title">
             <el-col :span="6">歌曲</el-col>
             <el-col :span="2" :offset="1">时长</el-col>
-            <el-col :span="4" :offset="1">歌手</el-col>
+            <el-col :span="2" :offset="1">歌手</el-col>
             <el-col :span="4" :offset="1">专辑</el-col>
           </el-row>
-          <el-row v-for="data in currentSongList" :key="data.id" class="song-list">
+          <el-row v-for="data in currentSongList" :key="data.id" class="list-item">
             <el-col :span="6" class="long-string">{{data.song}}</el-col>
             <el-col :span="2" :offset="1" class="long-string">{{data.dt}}</el-col>
-            <el-col :span="4" :offset="1" class="long-string">{{data.singer}}</el-col>
+            <el-col :span="2" :offset="1" class="long-string">{{data.singer}}</el-col>
             <el-col :span="4" :offset="1" class="long-string">{{data.album}}</el-col>
-            <el-col :span="2" :offset="1" class="play-btn">
-              <el-row class="play-icon">
-                <el-col :span="4">
+            <el-col :span="4" :offset="1">
+              <el-row type="flex" justify="space-around" class="play-icon">
+                <el-col :span="6">
                   <i class="el-icon-video-play" @click="playSong(data)"></i>
                 </el-col>
-                <el-col :span="4" :offset="4">
+                <el-col :span="6">
                   <i class="el-icon-circle-plus-outline" @click="listAdd(data)"></i>
+                </el-col>
+                <el-col :span="6">
+                  <i class="el-icon-star-off" v-show="!isShowCollection" @click="like(data)"></i>
+                  <i class="el-icon-delete" v-show="isShowCollection" @click="remove(data)"></i>
                 </el-col>
               </el-row>
             </el-col>
           </el-row>
           <el-pagination
-            class="mpage"
+            class="m-page"
             layout="prev, pager, next"
             :current-page = "currentPage"
             :page-size = "pageSize"
@@ -46,17 +55,19 @@
           </el-pagination>
         </el-col>
       </el-col>
-      <el-col :span="11" class="content song-content">
+      <el-col :span="11" class="m-content">
         <el-row>
-          <el-col class="content-name">{{playContent.song}}</el-col>
+          <el-col>{{playContent.song}}</el-col>
         </el-row>
-        <el-row>{{playContent.singer}}</el-row>
+        <el-row>
+          <el-col>{{playContent.singer}}</el-col>
+        </el-row>
         <el-row type="flex" justify="center" class="lyric-contain">
-          <el-col :span="23" class="song-lyric" :style="lyricMove">
+          <el-col :span="24" class="song-lyric" :style="lyricMove">
             <el-row
               v-for="(item,index) in lyric"
               :key="index"
-              :style="{'font-size': (index==currentRow ? '1.3rem':'.9rem')}"
+              :style="{'font-size': (index==currentRow ? '1.3rem':'.9rem'), 'color': (index==currentRow ? 'blue' : 'black')}"
               class="lyric-row"
             >{{item.text}}</el-row>
           </el-col>
@@ -85,7 +96,8 @@ export default {
         top: "6rem"
       },
       currentPage: 1,
-      pageSize: 10
+      pageSize: 10,
+      isShowCollection: false
     };
   },
   methods: {
@@ -96,6 +108,7 @@ export default {
         console.log(res);
         this.formatSongs(res.data.result.songs);
         this.page(1);
+        this.isShowCollection = false;
       }).catch(err => {
         console.log(err);
       });
@@ -131,6 +144,16 @@ export default {
     listAdd(obj) {
       this.$store.commit("addSong", obj);
     },
+    listAllAdd() {
+      for (let i = 0; i < this.songList.length; i++) {
+        this.$store.commit("addSong", this.songList[i]);
+      }
+    },
+    listAllRemove() {
+      for (let i = 0; i < this.songList.length; i++) {
+        this.$store.commit("removeSong", this.songList[i]);
+      }
+    },
     //获取歌词信息
     async getLyric(id) {
       let url = "https://autumnfish.cn/lyric?id=" + id;
@@ -163,12 +186,39 @@ export default {
       return a.time - b.time;
     },
     page(currentPage) {
+      this.currentPage = currentPage;
       let start = (currentPage-1) * this.pageSize;
       let end = Math.min(currentPage * this.pageSize, this.songList.length);
       this.currentSongList = this.songList.slice(start, end);
     },
     clearSongList() {
       this.songList = [];
+    },
+    async like(data) {
+      console.log(data);
+      const res = await this.$http.post('/add', data);
+      console.log(res);
+      this.$message({
+        type: 'success',
+        message: '收藏成功'
+      });
+    },
+    async fetch() {
+      const res = await this.$http.get('/list');
+      console.log(res);
+      this.songList = res.data;
+      this.page(this.currentPage);
+      console.log(this.currentPage);
+      this.isShowCollection = true;
+    },
+    async remove(data) {
+      const res = await this.$http.delete(`/delete/${data.id}`);
+      console.log(res);
+      this.$message({
+        type: 'success',
+        message: '取消收藏成功！'
+      });
+      this.fetch();
     }
   },
   computed: {
@@ -206,95 +256,96 @@ export default {
 </script>
 
 <style scoped>
-.template {
+.app-container {
+  position: relative;
+  height: 100%;
   width: 100%;
-  background: #f2f2f2;
 }
 
-.banner {
-  height: 100%;
-  overflow: hidden;
-  position: fixed;
+.bg {
+  position: absolute;
   top: 0;
   left: 0;
-  filter: blur(5px);
+  height: 100%;
+  width: 100%;
+  background-image: url('../assets/banner/sekiro.jpg');
+  background-position: center;
+  background-size: cover;
+  filter: blur(3px);
+  z-index: -1;
 }
 
-.banner-img {
-  transition: 0.5s;
+.m-container {
+  position: relative;
+  align-items: flex-start;
+  padding: 3rem 1rem 1rem 1rem;
+  height: calc(100% - 160px);
 }
 
-.banner-img img {
-  width: 100% !important;
+.left-panel {
+  height: 100%;
 }
 
-.content {
-  background: rgba(255, 255, 255, 0.7);
+.m-input {
+  margin-bottom: 1rem;
+}
+
+.m-button {
+  width: 100%;
+}
+
+.m-content {
+  background: rgba(255, 255, 255, 0.6);
   border-radius: 1rem;
-  min-height: 35rem;
+  padding: 1rem;
+  height: 80%;
+  overflow: auto;
 }
 
 .list-title {
-  padding: 0.5rem;
-  border-bottom: 1px solid slategray;
-  align-items: flex-end;
+  border-bottom: 0.25rem solid gray;
+  padding-bottom: 0.5rem;
+  font-weight: bold;
+  font-size: 1rem;
 }
 
-.song-list {
-  font-size: 0.8rem;
+.list-item {
+  border-bottom: 0.125rem solid slategray;
+  padding-top: 0.5rem;
   padding-bottom: 0.5rem;
-  margin: 1rem;
-  border-bottom: 1px solid slategray;
+  line-height: 2rem;
 }
 
 .play-icon {
-  font-size: 1.2rem;
+  font-size: 2rem;
 }
 
 .play-icon i:hover {
   color: #409eff;
 }
 
-.el-pagination >>> button,
-
-.el-pagination >>> li {
-  background: none;
-}
-
-.song-content {
-  min-height: 35rem;
-  max-height: 35rem;
-}
-
-.content-name {
-  font-family: "KaiTi";
-  padding: 2rem 0 1rem 0;
-  font-size: 2rem;
-}
-
 .lyric-contain {
   position: relative;
-  height: 20rem;
-  margin-top: 3rem;
+  height: 30rem;
+  margin-top: 1rem;
   overflow: hidden;
+  border: solid 0.5rem rgba(255, 255, 255, 0.8);
 }
 
 .song-lyric {
-  /* css保留空格和换行符*/
-  white-space: pre-wrap;
-  /* css保留换行符*/
-  white-space: pre-line;
   position: absolute;
   transition: 1s;
+  padding: 1rem;
 }
 
 .lyric-row {
   height: 2.5rem;
 }
 
-.mpage {
+.m-page {
   margin: 0 auto;
   text-align: center;
+  margin-top: 0.5rem;
 }
 
 .long-string {
@@ -306,17 +357,5 @@ export default {
 .long-string:hover {
   text-overflow:inherit;
   overflow:visible;
-}
-
-.el-input {
-  margin-bottom: 1em;
-}
-
-.music-container {
-  align-items: flex-end;
-}
-
-.el-pagination {
-  color: gray;
 }
 </style>

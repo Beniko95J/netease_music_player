@@ -4,16 +4,14 @@
       <el-col :span="1" class="logo">
         <img src="@/assets/mylogo.jpg" />
       </el-col>
-      <el-col :span="6">
+      <el-col :span="23">
         <el-menu
           :default-active="'1'"
           mode="horizontal"
           background-color="rgba(0, 0, 0, 1)"
           text-color="white"
-          active-text-color="orange"
-        >
+          active-text-color="orange">
           <el-menu-item index="1">发现音乐</el-menu-item>
-          <el-menu-item index="2">我收藏的音乐</el-menu-item>
         </el-menu>
       </el-col>
     </el-row>
@@ -38,12 +36,9 @@ export default {
 
 <style scoped>
 .header-nav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  height: 5rem;
+  position: relative;
+  height: 80px;
+  min-width: 1200px;
   background: rgba(0, 0, 0, 1);
   opacity: 0.6;
   transition: 0.5s;
@@ -60,7 +55,9 @@ export default {
 }
 
 .logo img {
-  height: 100%;
+  height: auto;
+  width: 100%;
+  max-width: 60px;
 }
 
 .el-row {
@@ -79,6 +76,6 @@ export default {
 }
 
 .el-menu-item:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
+  background: rgba(255, 255, 255, 0.6);
 }
 </style>

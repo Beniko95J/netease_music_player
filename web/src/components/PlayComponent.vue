@@ -1,13 +1,13 @@
 <template>
   <div class="play-control">
     <el-row type="flex" justify="flex-start">
-      <el-col :span="1.5" class="control-icon control-col">
+      <el-col :span="3" class="control-icon control-col" style="text-align:right">
         <i class="el-icon-caret-left play-icon" @click="prevSong"></i>
         <i class="el-icon-video-play play-icon" v-show="!playStatus" @click="play"></i>
         <i class="el-icon-video-pause play-icon" v-show="playStatus" @click="pause"></i>
         <i class="el-icon-caret-right play-icon" @click="nextSong"></i>
       </el-col>
-      <el-col :span="20" class="control-col">
+      <el-col :span="19" class="control-col">
         <el-row class="control-concent">
           <el-col :span="22" class="left-align">{{songContent.song}} - {{songContent.singer}}</el-col>
           <el-col :span="2" class="right-align">{{currentText}} / {{durationText}}</el-col>
@@ -19,7 +19,7 @@
           <el-col :span="0"></el-col>
         </el-row>
       </el-col>
-      <el-col :span="0.75" class="control-icon control-col">
+      <el-col :span="1" class="control-icon control-col">
         <el-tooltip class="item" effect="dark" content="单曲播放" placement="top">
           <i
             class="el-icon-ice-cream-square play-icon"
@@ -49,7 +49,7 @@
           ></i>
         </el-tooltip>
       </el-col>
-      <el-col :span="0.75" class="control-icon control-col">
+      <el-col :span="1" class="control-icon control-col">
         <el-tooltip class="item" effect="dark" content="播放列表" placement="top">
           <i class="el-icon-more play-icon" @click="listShow=!listShow"></i>
         </el-tooltip>
@@ -57,7 +57,7 @@
     </el-row>
     <audio ref="audio" autoplay></audio>
     <transition name="el-zoom-in-bottom">
-      <el-row class="play-list-container" type="flex" v-show="listShow">
+      <el-row class="play-list-container" v-show="listShow">
         <el-col>
           <el-row class="title" type="flex" justify="start">
             <el-col :span="23">播放列表</el-col>
@@ -184,7 +184,7 @@ export default {
     getSong(url) {
       axios.get(url).then(
         res => (
-          (this.$refs.audio.src = res.data.data[0].url), this.setTimer()
+          console.log(res.data.data[0].url), (this.$refs.audio.src = res.data.data[0].url), this.setTimer()
         )
       )
       .catch(function(err) {
@@ -281,12 +281,9 @@ export default {
 
 <style scoped>
 .play-control {
-  position: fixed;
-  bottom: 0rem;
-  left: 0;
-  right: 0;
+  position: relative;
+  height: 80px;
   width: 100%;
-  height: 5rem;
   background: rgba(0, 0, 0, 1);
   opacity: 0.6;
   transition: 0.5s;
@@ -333,6 +330,7 @@ export default {
   transition: 0.3s;
   border-bottom: 1px solid;
   align-items: middle;
+  line-height: 1rem;
 }
 
 .title {
@@ -421,10 +419,5 @@ i {
   white-space:nowrap; 
   overflow:hidden;
   text-overflow:ellipsis;
-}
-
-.long-string:hover {
-  text-overflow:inherit;
-  overflow:visible;
 }
 </style>
